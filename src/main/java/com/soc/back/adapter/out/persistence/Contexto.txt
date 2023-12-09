@@ -1,0 +1,9 @@
+Aqui estarana las entidades para el JPA, pero no son iguales a los de negocio, ya que estos
+se usan mas que todo para el contexto, y se usan mas que todo para el plasmado de las tablas,
+aqui estaran tambien los mapper para pasar de jpa al de dominio, aqui estaran los servicios de persistencia
+el nombre de los archivos deben ser asi:
+
+NombreEntity
+NombreMapper
+NombrePersistenceAdapter
+NombreRepository

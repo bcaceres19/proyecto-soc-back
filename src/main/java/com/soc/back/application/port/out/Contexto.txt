@@ -1,0 +1,3 @@
+Aqui estaran los puertos de salida, como son puertos seran interfaces, como son de salida
+aqui estara todo lo que tiene que con la persistencia, es recomendable usar el principio de
+responsabilidad unica, permitiendo que se pueda en el futuro hacer cambios a la persistencia mas facil

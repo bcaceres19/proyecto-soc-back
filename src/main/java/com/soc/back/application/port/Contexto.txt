@@ -1,0 +1,2 @@
+Los puertos son los que garantiza la comunicacion con las interfaces, estos seran los que se
+inyectan despues en el controlador web

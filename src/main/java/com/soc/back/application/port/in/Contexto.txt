@@ -1,0 +1,5 @@
+Este in hace referencia a los puertos de entrada (Sera data de entrada),
+aqui estaran las interfaces y los command que seran
+los objetos de parametros
+Ejemplo de nombramiento:
+    ServicioUnoPort -> Usa de paramatroz ServicioUnoCommand
