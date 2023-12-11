@@ -26,6 +26,8 @@ public class ReporteDocument {
 
     private String nombreReporte;
 
+    private String contenidoArchivo;
+
     private String archivo;
 
     @Enumerated(EnumType.STRING)

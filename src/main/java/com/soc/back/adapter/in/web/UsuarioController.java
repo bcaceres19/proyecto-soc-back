@@ -1,5 +1,6 @@
 package com.soc.back.adapter.in.web;
 
+import com.soc.back.application.port.in.AdminPort;
 import com.soc.back.application.port.in.UsuarioPort;
 import com.soc.back.application.port.in.command.ReporteCommand;
 import com.soc.back.application.port.in.command.UsuarioCommand;
@@ -10,26 +11,31 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/usuario/")
-public class UsuarioController {
+public class UsuarioController extends GeneralController{
 
     @Autowired
     private UsuarioPort usuarioPort;
 
+    @Autowired
+    private AdminPort adminPort;
+
     @PostMapping(path = "/crear")
     @ResponseBody
-    public RespuestaHttp crearReporte(@RequestBody UsuarioCommand command){
+    public RespuestaHttp crearUsuario(@RequestBody UsuarioCommand command){
         RespuestaHttp respuestaHttp;
         try{
             respuestaHttp =  new RespuestaHttp();
-            usuarioPort.crearUsuario(command);
-            respuestaHttp.setCodigo(String.valueOf(HttpStatus.CREATED.value()));
-            respuestaHttp.setEstatus(HttpStatus.CREATED.name());
-            respuestaHttp.setMenaje("Se creo correctamente el usuario");
+            boolean emailExists = usuarioPort.buscarEmailUsuario(command.getEmail());
+            boolean adminExists = adminPort.buscarEmailAdmin(command.getEmail());
+            if(emailExists || adminExists){
+                respuestaFinalHttp(respuestaHttp, "El email ingresado ya es de alguien mas, porfavor, ingresa uno nuevo", HttpStatus.BAD_REQUEST);
+            }else{
+                usuarioPort.crearUsuario(command);
+                respuestaFinalHttp(respuestaHttp, "Se creo correctamente el usuario", HttpStatus.CREATED);
+            }
         }catch (Exception e){
             respuestaHttp =  new RespuestaHttp();
-            respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-            respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
-            respuestaHttp.setMenaje("Hubo un fallo en la creacion del usuario");
+            respuestaFinalHttp(respuestaHttp, "Hubo un fallo en la creacion del usuario", HttpStatus.INTERNAL_SERVER_ERROR);
             System.err.println(e.getMessage());
         }
         return respuestaHttp;

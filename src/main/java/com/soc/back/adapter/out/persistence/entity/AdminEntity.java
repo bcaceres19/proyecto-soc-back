@@ -20,7 +20,4 @@ public class AdminEntity extends UsuarioGeneralEntity{
     @Id
     private Long id;
 
-    @Column(name = "nombre")
-    private String nombre;
-
 }

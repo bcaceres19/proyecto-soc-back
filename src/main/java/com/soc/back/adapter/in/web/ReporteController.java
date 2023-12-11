@@ -25,12 +25,12 @@ public class ReporteController {
             reportePort.crearReporte(command);
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.CREATED.value()));
             respuestaHttp.setEstatus(HttpStatus.CREATED.name());
-            respuestaHttp.setMenaje("Se creo correctamente el reporte");
+            respuestaHttp.setMensaje("Se creo correctamente el reporte");
         }catch (Exception e){
             respuestaHttp =  new RespuestaHttp();
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
-            respuestaHttp.setMenaje("Hubo un fallo en la creacion del reporte");
+            respuestaHttp.setMensaje("Hubo un fallo en la creacion del reporte");
             System.err.println(e.getMessage());
         }
         return respuestaHttp;

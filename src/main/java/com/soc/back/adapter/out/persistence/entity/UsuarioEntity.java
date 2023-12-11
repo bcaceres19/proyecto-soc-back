@@ -20,6 +20,7 @@ public class UsuarioEntity extends UsuarioGeneralEntity {
     @Id
     private Long id;
 
-    @Column(name = "nombre")
-    private String nombre;
+    @Column(name = "actividad")
+    private boolean actividad;
+
 }

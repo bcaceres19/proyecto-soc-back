@@ -15,14 +15,12 @@ public class AdminCommand {
 
     private String nombre;
 
+    private String apellido;
+
+    private String email;
+
+    private String password;
+
     private LocalDateTime fechaCreacion;
-
-    public Long getIdAdmin() {
-        return idAdmin;
-    }
-
-    public void setIdAdmin(Long idAdmin) {
-        this.idAdmin = idAdmin;
-    }
 
 }

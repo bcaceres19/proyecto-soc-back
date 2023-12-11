@@ -27,12 +27,12 @@ public class AdminController {
             adminPort.crearAdmin(command);
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.CREATED.value()));
             respuestaHttp.setEstatus(HttpStatus.CREATED.name());
-            respuestaHttp.setMenaje("Se creo correctamente el admin");
+            respuestaHttp.setMensaje("Se creo correctamente el admin");
         }catch (Exception e){
             respuestaHttp =  new RespuestaHttp();
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
-            respuestaHttp.setMenaje("Hubo un fallo en la creacion del admin");
+            respuestaHttp.setMensaje("Hubo un fallo en la creacion del admin");
             System.err.println(e.getMessage());
         }
         return respuestaHttp;
@@ -46,14 +46,13 @@ public class AdminController {
             adminPort.actualizarAdmin(command);
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.OK.value()));
             respuestaHttp.setEstatus(HttpStatus.OK.name());
-            respuestaHttp.setMenaje("Se actualizaco correctamente el admin");
+            respuestaHttp.setMensaje("Se actualizo correctamente el admin");
         }catch (Exception e){
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
-            respuestaHttp.setMenaje("Hubo un fallo en la actualizacion del admin");
+            respuestaHttp.setMensaje("Hubo un fallo en la actualizacion del admin");
             System.err.println(e.getMessage());
         }
         return respuestaHttp;
     }
-
 }

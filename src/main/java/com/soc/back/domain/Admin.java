@@ -20,6 +20,12 @@ public class Admin {
 
     private String nombre;
 
+    private String apellido;
+
+    private String email;
+
+    private String password;
+
     private LocalDateTime fechaCreacion;
 
     private LocalDateTime fechaActualizacion;
