@@ -33,5 +33,7 @@ public abstract class UsuarioGeneralEntity {
     @Column(name = "apellido")
     private String apellido;
 
+    @Column(name = "actividad")
+    private boolean actividad;
 
 }

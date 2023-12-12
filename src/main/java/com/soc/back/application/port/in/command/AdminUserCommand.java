@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AdminUserCommand {
 
+    public AdminUserCommand(String email, Boolean actividad) {
+        this.email = email;
+        this.actividad = actividad;
+    }
+
     public AdminUserCommand(Long id, String email, boolean admin, boolean usuario) {
         this.id = id;
         this.email = email;
@@ -22,8 +27,21 @@ public class AdminUserCommand {
 
     private String password;
 
-    private boolean admin;
+    private Boolean admin;
 
-    private boolean usuario;
+    private Boolean usuario;
 
+    private Boolean actividad;
+
+    @Override
+    public String toString() {
+        return "AdminUserCommand{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", admin=" + admin +
+                ", usuario=" + usuario +
+                ", actividad=" + actividad +
+                '}';
+    }
 }

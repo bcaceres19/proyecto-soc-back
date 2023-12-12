@@ -41,4 +41,18 @@ public class UsuarioController extends GeneralController{
         return respuestaHttp;
     }
 
+    @GetMapping("/allUsuarios")
+    @ResponseBody
+    public RespuestaHttp allUsuarios(){
+        RespuestaHttp respuestaHttp;
+        try{
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, usuarioPort.traerAllUsuarios(), HttpStatus.OK);
+        }catch (Exception e){
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, "Hubo un fallo en la creacion del usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+            System.err.println(e.getMessage());
+        }
+        return respuestaHttp;
+    }
 }

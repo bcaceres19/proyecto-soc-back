@@ -6,12 +6,16 @@ import com.soc.back.application.port.in.UsuarioPort;
 import com.soc.back.application.port.in.command.AdminCommand;
 import com.soc.back.application.port.in.command.AdminUserCommand;
 import com.soc.back.common.RespuestaHttp;
+import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/user/")
+@Log4j2
 public class AdminUserController extends GeneralController{
 
     @Autowired
@@ -52,6 +56,30 @@ public class AdminUserController extends GeneralController{
         }catch (Exception e){
             respuestaHttp =  new RespuestaHttp();
             respuestaFinalHttp(respuestaHttp, "Hubo un fallo en la creacion del admin", HttpStatus.INTERNAL_SERVER_ERROR);
+            System.err.println(e.getMessage());
+        }
+        return respuestaHttp;
+    }
+
+    @PostMapping("/cambiarEstado")
+    @ResponseBody
+    @Transactional
+    public RespuestaHttp cambiarEstado(@RequestBody AdminUserCommand command){
+        RespuestaHttp respuestaHttp;
+        try{
+            respuestaHttp =  new RespuestaHttp();
+            if(Boolean.TRUE.equals(command.getAdmin())){
+                adminPort.cambiaEstado(command.getActividad(), command.getId());
+                respuestaFinalHttp(respuestaHttp, "Se cambio el estado correctamente", HttpStatus.OK);
+            }else if(Boolean.TRUE.equals(command.getUsuario())){
+                usuarioPort.cambiarEstadoUser(command.getActividad(), command.getId());
+                respuestaFinalHttp(respuestaHttp, "Se cambio el estado correctamente", HttpStatus.OK);
+            }else{
+                respuestaFinalHttp(respuestaHttp, "Hubo un fallo en el cambio del estado", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }catch (Exception e){
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, "Hubo un fallo en el cambio del estado", HttpStatus.INTERNAL_SERVER_ERROR);
             System.err.println(e.getMessage());
         }
         return respuestaHttp;

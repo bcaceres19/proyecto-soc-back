@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/")
-public class AdminController {
+public class AdminController extends GeneralController{
 
     @Autowired
     private AdminPort adminPort;
@@ -51,6 +51,21 @@ public class AdminController {
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
             respuestaHttp.setMensaje("Hubo un fallo en la actualizacion del admin");
+            System.err.println(e.getMessage());
+        }
+        return respuestaHttp;
+    }
+
+    @GetMapping("/allAdmins")
+    @ResponseBody
+    public RespuestaHttp allAdmins(){
+        RespuestaHttp respuestaHttp;
+        try{
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, adminPort.traerAllAdmins(), HttpStatus.OK);
+        }catch (Exception e){
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, "Hubo un fallo en la creacion del usuario", HttpStatus.INTERNAL_SERVER_ERROR);
             System.err.println(e.getMessage());
         }
         return respuestaHttp;

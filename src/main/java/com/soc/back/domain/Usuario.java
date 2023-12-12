@@ -14,6 +14,8 @@ public class Usuario {
 
     private String apellido;
 
+    private boolean actividad;
+
     private String email;
 
     private String password;

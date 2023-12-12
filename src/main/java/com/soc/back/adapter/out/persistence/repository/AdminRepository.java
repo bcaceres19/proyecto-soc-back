@@ -1,10 +1,16 @@
 package com.soc.back.adapter.out.persistence.repository;
 
 import com.soc.back.adapter.out.persistence.entity.AdminEntity;
+import com.soc.back.application.port.in.command.AdminCommand;
 import com.soc.back.application.port.in.command.AdminUserCommand;
+import com.soc.back.application.port.in.command.UsuarioCommand;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface AdminRepository extends JpaRepository<AdminEntity, Long> {
 
@@ -12,5 +18,12 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Long> {
     AdminUserCommand adminLog(@Param("email") String email, @Param("password") String password);
 
     boolean existsByEmail(String email);
+    @Modifying
+    @Query(value = "UPDATE admin SET actividad=:estado where id=:idAdmin ", nativeQuery = true)
+    @Transactional
+    void actualizarEstado(@Param("estado") boolean estado, @Param("idAdmin") Long idAdmin);
+
+    @Query("SELECT new com.soc.back.application.port.in.command.AdminCommand(a.nombre, a.actividad) FROM AdminEntity a ")
+    List<AdminCommand> buscarAllUsuarios();
 
 }

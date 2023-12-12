@@ -30,6 +30,8 @@ public class Admin {
 
     private LocalDateTime fechaActualizacion;
 
+    private boolean actividad;
+
 
 }
 

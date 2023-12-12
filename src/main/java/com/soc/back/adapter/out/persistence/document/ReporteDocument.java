@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -22,13 +23,19 @@ public class ReporteDocument {
     @Id
     private String codigoReporte;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime fechaCreacion;
 
     private String nombreReporte;
 
     private String contenidoArchivo;
 
+
+    private String contenido;
+
     private String archivo;
+
+    private String tipo;
 
     @Enumerated(EnumType.STRING)
     private ExtensionEnum extension;

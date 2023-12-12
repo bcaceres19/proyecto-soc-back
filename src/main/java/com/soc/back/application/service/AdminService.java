@@ -4,16 +4,14 @@ package com.soc.back.application.service;
 import com.soc.back.application.port.in.AdminPort;
 import com.soc.back.application.port.in.command.AdminCommand;
 import com.soc.back.application.port.in.command.AdminUserCommand;
-import com.soc.back.application.port.out.admin.ActualizarAdminPort;
-import com.soc.back.application.port.out.admin.BuscarEmailAdminPort;
-import com.soc.back.application.port.out.admin.BuscarExistAdminPort;
-import com.soc.back.application.port.out.admin.CrearAdminPort;
+import com.soc.back.application.port.out.admin.*;
 import com.soc.back.domain.Admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AdminService implements AdminPort {
@@ -30,6 +28,12 @@ public class AdminService implements AdminPort {
 
     @Autowired
     private BuscarEmailAdminPort buscarEmailAdminPort;
+
+    @Autowired
+    private CambiarEstadoAdminPort cambiarEstadoAdminPort;
+
+    @Autowired
+    private BuscarAllAdminsPort buscarAllAdminsPort;
 
     @Override
     public void crearAdmin(AdminCommand command) {
@@ -59,5 +63,15 @@ public class AdminService implements AdminPort {
     @Override
     public boolean buscarEmailAdmin(String email) {
         return buscarEmailAdminPort.buscarEmailAdminPort(email);
+    }
+
+    @Override
+    public void cambiaEstado(boolean estado, Long idAdmin) {
+        this.cambiarEstadoAdminPort.cambiarEstadoAdmin(estado, idAdmin);
+    }
+
+    @Override
+    public List<AdminCommand> traerAllAdmins() {
+        return buscarAllAdminsPort.buscarAllAdmins();
     }
 }

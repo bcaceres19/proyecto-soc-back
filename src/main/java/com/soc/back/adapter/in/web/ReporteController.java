@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/reporte/")
-public class ReporteController {
+public class ReporteController extends GeneralController{
 
     @Autowired
     private ReportePort reportePort;
@@ -31,6 +31,22 @@ public class ReporteController {
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             respuestaHttp.setEstatus(HttpStatus.INTERNAL_SERVER_ERROR.name());
             respuestaHttp.setMensaje("Hubo un fallo en la creacion del reporte");
+            System.err.println(e.getMessage());
+        }
+        return respuestaHttp;
+    }
+
+    @PostMapping(path = "/reportesUsuario")
+    @ResponseBody
+    public RespuestaHttp traerReportesUsuario(@RequestBody ReporteCommand command){
+        RespuestaHttp respuestaHttp;
+        try{
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp,reportePort.buscarReporteByUser(command), HttpStatus.OK);
+
+        }catch (Exception e){
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp,"Hubo un fallo en la traida de reportes", HttpStatus.INTERNAL_SERVER_ERROR);
             System.err.println(e.getMessage());
         }
         return respuestaHttp;

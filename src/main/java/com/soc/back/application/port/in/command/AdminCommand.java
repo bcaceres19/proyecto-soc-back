@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AdminCommand {
 
+    public AdminCommand(String nombre, Boolean actividad) {
+        this.nombre = nombre;
+        this.actividad = actividad;
+    }
+
     private Long idAdmin;
 
     private String nombre;
@@ -22,5 +27,8 @@ public class AdminCommand {
     private String password;
 
     private LocalDateTime fechaCreacion;
+
+    private Boolean actividad;
+
 
 }
