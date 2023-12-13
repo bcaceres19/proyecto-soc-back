@@ -26,4 +26,12 @@ public interface AdminRepository extends JpaRepository<AdminEntity, Long> {
     @Query("SELECT new com.soc.back.application.port.in.command.AdminCommand(a.nombre, a.actividad) FROM AdminEntity a ")
     List<AdminCommand> buscarAllUsuarios();
 
+    @Query(value = "SELECT u.id as admin_id, COUNT(ar.id_admin) as cantidad_registros\n" +
+            "FROM admin u\n" +
+            "left JOIN admin_reporte ar ON u.id = ar.id_admin\n" +
+            "GROUP BY u.id order by cantidad_registros ASC", nativeQuery = true)
+    List<Object[]> adminDisponible();
+
+    @Query(value = "select ar.codigo_reporte from admin a join admin_reporte ar on a.id = ar.id_admin where a.id = :idAdmin and ar.fecha_revision is null", nativeQuery = true)
+    List<Object[]>  reportesAdmin(@Param("idAdmin") Long idAdmin);
 }

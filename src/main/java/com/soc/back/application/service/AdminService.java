@@ -4,16 +4,20 @@ package com.soc.back.application.service;
 import com.soc.back.application.port.in.AdminPort;
 import com.soc.back.application.port.in.command.AdminCommand;
 import com.soc.back.application.port.in.command.AdminUserCommand;
+import com.soc.back.application.port.in.command.ReporteCommand;
 import com.soc.back.application.port.out.admin.*;
+import com.soc.back.application.port.out.reporte.BuscarReporteByCodigoAdminPort;
 import com.soc.back.domain.Admin;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Log4j2
 public class AdminService implements AdminPort {
 
 
@@ -35,6 +39,12 @@ public class AdminService implements AdminPort {
     @Autowired
     private BuscarAllAdminsPort buscarAllAdminsPort;
 
+    @Autowired
+    private ReportesAdminPort reportesAdminPort;
+
+    @Autowired
+    private BuscarReporteByCodigoAdminPort buscarReporteByCodigoAdminPort;
+
     @Override
     public void crearAdmin(AdminCommand command) {
         Admin admin = new Admin();
@@ -48,7 +58,7 @@ public class AdminService implements AdminPort {
 
     @Override
     public void actualizarAdmin(AdminCommand command) {
-        Admin admin = new Admin(command.getIdAdmin(), command.getNombre(), LocalDateTime.now());
+        Admin admin = new Admin(command.getId(), command.getNombre(), LocalDateTime.now());
         actualizarAdminPort.actualizarAdmin(admin);
     }
 
@@ -73,5 +83,16 @@ public class AdminService implements AdminPort {
     @Override
     public List<AdminCommand> traerAllAdmins() {
         return buscarAllAdminsPort.buscarAllAdmins();
+    }
+
+    @Override
+    public List<ReporteCommand> reportesAdmin(Long idAdmin) {
+        List<Object[]> adminReportes = reportesAdminPort.reportesAdmin(idAdmin);
+        List<ReporteCommand> reportes = new ArrayList<>();
+        adminReportes.forEach(r -> {
+            reportes.add(buscarReporteByCodigoAdminPort.buscarReporteByCodigo(r[0].toString()).get(0));
+        });
+
+        return reportes;
     }
 }

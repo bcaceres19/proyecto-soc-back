@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class AdminPersistenceAdapter implements CrearAdminPort, ActualizarAdminPort, BuscarExistAdminPort, BuscarEmailAdminPort, CambiarEstadoAdminPort, BuscarAllAdminsPort {
+public class AdminPersistenceAdapter implements CrearAdminPort, ActualizarAdminPort, BuscarExistAdminPort, BuscarEmailAdminPort, CambiarEstadoAdminPort, BuscarAllAdminsPort, BuscarAdminDispoPort, ReportesAdminPort {
 
     @Autowired
     private AdminRepository adminRepository;
@@ -46,5 +46,15 @@ public class AdminPersistenceAdapter implements CrearAdminPort, ActualizarAdminP
     @Override
     public List<AdminCommand> buscarAllAdmins() {
         return this.adminRepository.buscarAllUsuarios();
+    }
+
+    @Override
+    public List<Object[]> buscarAdminDispo() {
+        return this.adminRepository.adminDisponible();
+    }
+
+    @Override
+    public List<Object[]> reportesAdmin(Long idAdmin) {
+        return this.adminRepository.reportesAdmin(idAdmin);
     }
 }

@@ -16,7 +16,7 @@ public class AdminCommand {
         this.actividad = actividad;
     }
 
-    private Long idAdmin;
+    private Long id;
 
     private String nombre;
 

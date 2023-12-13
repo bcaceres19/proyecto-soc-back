@@ -30,6 +30,9 @@ public class ReporteDocument {
 
     private String contenidoArchivo;
 
+    private String tituloReporte;
+
+    private String cuerpoGeneral;
 
     private String contenido;
 

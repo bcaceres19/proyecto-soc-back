@@ -2,6 +2,7 @@ package com.soc.back.adapter.in.web;
 
 
 import com.soc.back.application.port.in.AdminPort;
+import com.soc.back.application.port.in.UsuarioPort;
 import com.soc.back.application.port.in.command.AdminCommand;
 import com.soc.back.common.RespuestaHttp;
 import lombok.extern.log4j.Log4j2;
@@ -18,16 +19,23 @@ public class AdminController extends GeneralController{
     @Autowired
     private AdminPort adminPort;
 
+    @Autowired
+    private UsuarioPort usuarioPort;
+
     @PostMapping(path = "/crear")
     @ResponseBody
     public RespuestaHttp crearAdmin(@RequestBody AdminCommand command){
         RespuestaHttp respuestaHttp;
         try{
             respuestaHttp =  new RespuestaHttp();
-            adminPort.crearAdmin(command);
-            respuestaHttp.setCodigo(String.valueOf(HttpStatus.CREATED.value()));
-            respuestaHttp.setEstatus(HttpStatus.CREATED.name());
-            respuestaHttp.setMensaje("Se creo correctamente el admin");
+            boolean emailExists = usuarioPort.buscarEmailUsuario(command.getEmail());
+            boolean adminExists = adminPort.buscarEmailAdmin(command.getEmail());
+            if(emailExists || adminExists){
+                respuestaFinalHttp(respuestaHttp, "El email ingresado ya es de alguien mas, porfavor, ingresa uno nuevo", HttpStatus.BAD_REQUEST);
+            }else{
+                adminPort.crearAdmin(command);
+                respuestaFinalHttp(respuestaHttp, "Se creo correctamente el admin", HttpStatus.CREATED);
+            }
         }catch (Exception e){
             respuestaHttp =  new RespuestaHttp();
             respuestaHttp.setCodigo(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
@@ -70,4 +78,20 @@ public class AdminController extends GeneralController{
         }
         return respuestaHttp;
     }
+
+    @GetMapping("/allReportsAdmin")
+    @ResponseBody
+    public RespuestaHttp reportesAdmin(@RequestParam("idAdmin") Long idAdmin){
+        RespuestaHttp respuestaHttp;
+        try{
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, adminPort.reportesAdmin(idAdmin), HttpStatus.OK);
+        }catch (Exception e){
+            respuestaHttp =  new RespuestaHttp();
+            respuestaFinalHttp(respuestaHttp, "Hubo un fallo en la creacion del usuario", HttpStatus.INTERNAL_SERVER_ERROR);
+            System.err.println(e.getMessage());
+        }
+        return respuestaHttp;
+    }
+
 }

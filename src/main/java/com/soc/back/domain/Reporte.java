@@ -16,6 +16,10 @@ public class Reporte {
 
     private String nombreReporte;
 
+    private String tituloReporte;
+
+    private String cuerpoGeneral;
+
     private String archivo;
 
     private String contenido;

@@ -1,15 +1,20 @@
 package com.soc.back.application.service;
 
+import com.soc.back.adapter.out.persistence.mapper.AdminMapper;
 import com.soc.back.application.port.in.ReportePort;
+import com.soc.back.application.port.in.command.AdminCommand;
+import com.soc.back.application.port.in.command.AdminReporteCommand;
 import com.soc.back.application.port.in.command.ReporteCommand;
 import com.soc.back.application.port.in.command.UsuarioCommand;
-import com.soc.back.application.port.out.reporte.BuscarReporteByUserPort;
-import com.soc.back.application.port.out.reporte.CrearReportePort;
+import com.soc.back.application.port.out.admin.BuscarAdminDispoPort;
+import com.soc.back.application.port.out.admin.ReportesAdminPort;
+import com.soc.back.application.port.out.adminreporte.CrearAdminReportePort;
+import com.soc.back.application.port.out.adminreporte.EliminarAdminReportePort;
+import com.soc.back.application.port.out.reporte.*;
 import com.soc.back.application.port.out.usuario.BuscarIdUsuarioPort;
-import com.soc.back.application.port.out.usuario.CrearUsuarioPort;
 import com.soc.back.common.enums.ExtensionEnum;
 import com.soc.back.domain.Reporte;
-import com.soc.back.domain.Usuario;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,7 @@ import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -36,27 +42,61 @@ public class ReporteService implements ReportePort {
     @Autowired
     private BuscarIdUsuarioPort buscarIdUsuarioPort;
 
+    @Autowired
+    private BuscarReporteByCodigoAdminPort buscarReporteByCodigoAdminPort;
+
+    @Autowired
+    private BuscarReporteByFechaAdminPort buscarReporteByFechaAdminPort;
+
+    @Autowired
+    private BuscarAdminDispoPort buscarAdminDispoPort;
+
+    @Autowired
+    private CrearAdminReportePort crearAdminReportePort;
+
+    @Autowired
+    private ActualizarReportePort actualizarReportePort;
+
+    @Autowired
+    private ReportesAdminPort reportesAdminPort;
+
+    @Autowired
+    private BuscarReporteByCodigoUserPort buscarReporteByCodigoUserPort;
+
+    @Autowired
+    private BuscarReporteByFechaUserPort buscarReporteByFechaUserPort;
+
+    @Autowired
+    private EliminarReportePort eliminarReportePort;
+
+    @Autowired
+    private EliminarAdminReportePort eliminarAdminReportePort;
+
+    @Autowired
+    private AceptarReportePort aceptarReportePort;
+
     @Override
     public void crearReporte(ReporteCommand comando) {
         Reporte reporte = new Reporte();
         reporte.setCodigoReporte(generarCodigoReporte());
         reporte.setUsuarioCreacion(comando.getUsuarioCreacion());
-        String textoLimpio = quitarTildesComasPuntos(comando.getContenido());
+        reporte.setTituloReporte(comando.getTituloReporte());
+        reporte.setCuerpoGeneral(comando.getCuerpoGeneral());
+        String textoLimpio = quitarTildesComasPuntos(comando.getCuerpoGeneral());
         reporte.setTipo(detectarTipo(textoLimpio));
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String fechaFormateada = LocalDateTime.now().format(formato);
         UsuarioCommand usuario = buscarIdUsuarioPort.buscarIdUsuarioPort(comando.getUsuarioCreacion());
-        log.error(usuario);
         comando.setFechaCreacion(LocalDateTime.parse(fechaFormateada, formato));
         String nombreArchivo = "Reporte"+ "-" + reporte.getCodigoReporte();
-        StringBuffer txt = new StringBuffer(comando.getTitulo());
+        StringBuffer txt = new StringBuffer(comando.getTituloReporte());
         txt
                 .append("-")
                 .append(fechaFormateada)
                 .append("\n")
                 .append("Tipo: ").append(reporte.getTipo())
                 .append("\n")
-                .append(comando.getContenido())
+                .append(comando.getCuerpoGeneral())
                 .append("\n")
                 .append(usuario.getNombre()).append(" ").append(usuario.getApellido());
         try{
@@ -77,6 +117,10 @@ public class ReporteService implements ReportePort {
             reporte.setContenido(contenidoBase64);
             archivo.delete();
             crearReportePort.crearReporte(reporte);
+            AdminReporteCommand adminReporteCommand = new AdminReporteCommand();
+            adminReporteCommand.setCodigoReporte(reporte.getCodigoReporte());
+            adminReporteCommand.setAdmin(AdminMapper.INSTANCE.commadnToEntity(adminAsignado()));
+            crearAdminReportePort.crearAdminReporte(adminReporteCommand);
         }catch (Exception ex){
             ex.printStackTrace();
             log.error(ex.getMessage());
@@ -86,6 +130,101 @@ public class ReporteService implements ReportePort {
     @Override
     public List<ReporteCommand> buscarReporteByUser(ReporteCommand command) {
         return buscarReporteByUserPort.buscarReporteByUser(command.getUsuarioCreacion());
+    }
+
+    @Override
+    public List<ReporteCommand> buscarReporteByCodigo(String codigo, Long idAdmin, Long idUsuario) {
+        List<ReporteCommand> reportes = new ArrayList<>();
+        if(idAdmin != null){
+            List<Object[]> reportesAdmin = reportesAdminPort.reportesAdmin(idAdmin);
+            reportes = this.buscarReporteByCodigoAdminPort.buscarReporteByCodigo(codigo);
+            // Obtener los códigos de reportesAdmin
+            Set<String> codigosReportesAdmin = reportesAdmin.stream()
+                    .map(report -> (String) report[0])  // Asumiendo que el código está en la posición 0 del array
+                    .collect(Collectors.toSet());
+            reportes = reportes.stream()
+                    .filter(reporte -> codigosReportesAdmin.contains(reporte.getCodigoReporte()))
+                    .collect(Collectors.toList());
+        }else if(idUsuario != null){
+            reportes =  this.buscarReporteByCodigoUserPort.buscarReporteByCodigoUser(codigo,idUsuario);
+        }else{
+            reportes =  this.buscarReporteByCodigoAdminPort.buscarReporteByCodigo(codigo);
+        }
+        return reportes;
+    }
+
+    @Override
+    public List<ReporteCommand> buscarReporteByFecha(LocalDateTime fecha, Long idAdmin, Long idUsuario) {
+        List<ReporteCommand> reportes = new ArrayList<>();
+        if(idAdmin != null){
+            List<Object[]> reportesAdmin = reportesAdminPort.reportesAdmin(idAdmin);
+            reportes = this.buscarReporteByFechaAdminPort.buscarReporteByFecha(fecha);
+            // Obtener los códigos de reportesAdmin
+            Set<String> codigosReportesAdmin = reportesAdmin.stream()
+                    .map(report -> (String) report[0])  // Asumiendo que el código está en la posición 0 del array
+                    .collect(Collectors.toSet());
+            reportes = reportes.stream()
+                    .filter(reporte -> codigosReportesAdmin.contains(reporte.getCodigoReporte()))
+                    .collect(Collectors.toList());
+        }else {
+            reportes = this.buscarReporteByFechaUserPort.buscarReporteByFecha(fecha, idUsuario);
+        }
+
+        return reportes;
+    }
+
+    @Override
+    public void actualizarReporte(ReporteCommand command) {
+        String textoLimpio = quitarTildesComasPuntos(command.getCuerpoGeneral());
+        command.setTipo(detectarTipo(textoLimpio));
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String fechaFormateada = LocalDateTime.now().format(formato);
+        UsuarioCommand usuario = buscarIdUsuarioPort.buscarIdUsuarioPort(command.getUsuarioCreacion());
+        String nombreArchivo = "Reporte"+ "-" + command.getCodigoReporte();
+        StringBuffer txt = new StringBuffer(command.getTituloReporte());
+        txt
+                .append("-")
+                .append(fechaFormateada)
+                .append("\n")
+                .append("Tipo: ").append(command.getTipo())
+                .append("\n")
+                .append(command.getCuerpoGeneral())
+                .append("\n")
+                .append(usuario.getNombre()).append(" ").append(usuario.getApellido());
+        try{
+            File archivo = new File(nombreArchivo);
+            FileWriter writer = new FileWriter(archivo);
+            BufferedWriter bw = new BufferedWriter(writer);
+            bw.write(txt.toString());
+            bw.flush();
+            writer.close();
+            byte[] archivoTxt = Files.readAllBytes(Paths.get(archivo.getAbsolutePath()));
+            byte[] contenido = txt.toString().getBytes(StandardCharsets.UTF_8);
+            String base64 = Base64.getEncoder().encodeToString(archivoTxt);
+            String contenidoBase64 = Base64.getEncoder().encodeToString(contenido);
+            command.setFechaCreacion(command.getFechaCreacion());
+            command.setNombreReporte(nombreArchivo);
+            command.setExtension(ExtensionEnum.TXT);
+            command.setArchivo(base64);
+            command.setContenido(contenidoBase64);
+            archivo.delete();
+            this.actualizarReportePort.actualizarReporte(command);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            log.error(ex.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void eliminarReporte(String codigoReporte) {
+        eliminarReportePort.eliminarReporte(codigoReporte);
+        eliminarAdminReportePort.eliminarAdminReporte(codigoReporte);
+    }
+
+    @Override
+    public void aceptarReporte(String codigoReporte) {
+        aceptarReportePort.aceptarReporte(codigoReporte);
     }
 
 
@@ -134,6 +273,13 @@ public class ReporteService implements ReportePort {
 
         return textoSinComasPuntos;
 
+    }
+
+
+    private AdminCommand adminAsignado(){
+        AdminCommand admin = new AdminCommand();
+        admin.setId(Long.valueOf(buscarAdminDispoPort.buscarAdminDispo().get(0)[0].toString()));
+        return admin;
     }
 
 }

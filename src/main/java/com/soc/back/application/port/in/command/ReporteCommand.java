@@ -11,10 +11,6 @@ import java.time.LocalDateTime;
 @Data
 public class ReporteCommand {
 
-    private String titulo;
-
-    private String contenido;
-
     private Long usuarioCreacion;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -25,6 +21,12 @@ public class ReporteCommand {
     private String nombreReporte;
 
     private String archivo;
+
+    private String contenido;
+
+    private String tituloReporte;
+
+    private String cuerpoGeneral;
 
     @Enumerated(EnumType.STRING)
     private ExtensionEnum extension;
