@@ -4,6 +4,7 @@ import com.soc.back.adapter.out.persistence.entity.AdminReporteEntity;
 import com.soc.back.adapter.out.persistence.mapper.AdminReporteMapper;
 import com.soc.back.adapter.out.persistence.repository.AdminReporteRepository;
 import com.soc.back.application.port.in.command.AdminReporteCommand;
+import com.soc.back.application.port.out.adminreporte.BuscarConfirmacionReportePort;
 import com.soc.back.application.port.out.adminreporte.CrearAdminReportePort;
 import com.soc.back.application.port.out.adminreporte.EliminarAdminReportePort;
 import com.soc.back.application.port.out.reporte.AceptarReportePort;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 
 @Repository
-public class AdminReportePersistenceAdapter implements CrearAdminReportePort, EliminarAdminReportePort, AceptarReportePort {
+public class AdminReportePersistenceAdapter implements CrearAdminReportePort, EliminarAdminReportePort, AceptarReportePort, BuscarConfirmacionReportePort {
 
     @Autowired
     private AdminReporteRepository adminReporteRepository;
@@ -32,5 +33,10 @@ public class AdminReportePersistenceAdapter implements CrearAdminReportePort, El
     @Override
     public void aceptarReporte(String codigo) {
        adminReporteRepository.confirmarReporte(LocalDateTime.now(), codigo);
+    }
+
+    @Override
+    public boolean buscarConfirmacionReporte(String codigo) {
+        return Boolean.valueOf(adminReporteRepository.buscarReporteConfirmado(codigo));
     }
 }

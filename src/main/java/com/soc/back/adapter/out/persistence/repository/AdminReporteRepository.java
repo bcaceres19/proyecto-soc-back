@@ -17,6 +17,16 @@ public interface AdminReporteRepository extends JpaRepository<AdminReporteEntity
     @Modifying
     @Query(value = "UPDATE admin_reporte SET fecha_revision = :fecha where codigo_reporte=:codigo", nativeQuery = true)
     @Transactional
-    void confirmarReporte(@Param("fecha")LocalDateTime fecha, @Param("codigo") String  codigo);
+    void confirmarReporte(@Param("fecha") LocalDateTime fecha, @Param("codigo") String codigo);
 
+    @Query(value = "SELECT\n" +
+            "  CASE\n" +
+            "    WHEN ar.fecha_revision is null THEN 'true'\n" +
+            "    ELSE 'false'\n" +
+            "  END AS resultado\n" +
+            "FROM\n" +
+            "  admin_reporte ar\n" +
+            "WHERE\n" +
+            "   ar.codigo_reporte = :codigo", nativeQuery = true)
+    String buscarReporteConfirmado(@Param("codigo") String codigo);
 }

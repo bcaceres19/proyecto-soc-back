@@ -8,6 +8,7 @@ import com.soc.back.application.port.in.command.ReporteCommand;
 import com.soc.back.application.port.in.command.UsuarioCommand;
 import com.soc.back.application.port.out.admin.BuscarAdminDispoPort;
 import com.soc.back.application.port.out.admin.ReportesAdminPort;
+import com.soc.back.application.port.out.adminreporte.BuscarConfirmacionReportePort;
 import com.soc.back.application.port.out.adminreporte.CrearAdminReportePort;
 import com.soc.back.application.port.out.adminreporte.EliminarAdminReportePort;
 import com.soc.back.application.port.out.reporte.*;
@@ -75,6 +76,9 @@ public class ReporteService implements ReportePort {
     @Autowired
     private AceptarReportePort aceptarReportePort;
 
+    @Autowired
+    private BuscarConfirmacionReportePort buscarConfirmacionReportePort;
+
     @Override
     public void crearReporte(ReporteCommand comando) {
         Reporte reporte = new Reporte();
@@ -129,6 +133,7 @@ public class ReporteService implements ReportePort {
 
     @Override
     public List<ReporteCommand> buscarReporteByUser(ReporteCommand command) {
+        List<ReporteCommand> reportes = new ArrayList<>();
         return buscarReporteByUserPort.buscarReporteByUser(command.getUsuarioCreacion());
     }
 
@@ -146,7 +151,12 @@ public class ReporteService implements ReportePort {
                     .filter(reporte -> codigosReportesAdmin.contains(reporte.getCodigoReporte()))
                     .collect(Collectors.toList());
         }else if(idUsuario != null){
-            reportes =  this.buscarReporteByCodigoUserPort.buscarReporteByCodigoUser(codigo,idUsuario);
+            for(ReporteCommand reporte : this.buscarReporteByCodigoUserPort.buscarReporteByCodigoUser(codigo,idUsuario)){
+                log.error(buscarConfirmacionReportePort.buscarConfirmacionReporte(reporte.getCodigoReporte()));
+                if(buscarConfirmacionReportePort.buscarConfirmacionReporte(reporte.getCodigoReporte())){
+                    reportes.add(reporte);
+                }
+            }
         }else{
             reportes =  this.buscarReporteByCodigoAdminPort.buscarReporteByCodigo(codigo);
         }
@@ -167,7 +177,11 @@ public class ReporteService implements ReportePort {
                     .filter(reporte -> codigosReportesAdmin.contains(reporte.getCodigoReporte()))
                     .collect(Collectors.toList());
         }else {
-            reportes = this.buscarReporteByFechaUserPort.buscarReporteByFecha(fecha, idUsuario);
+            for(ReporteCommand reporte : this.buscarReporteByFechaUserPort.buscarReporteByFecha(fecha,idUsuario)){
+                if(buscarConfirmacionReportePort.buscarConfirmacionReporte(reporte.getCodigoReporte())){
+                    reportes.add(reporte);
+                }
+            }
         }
 
         return reportes;

@@ -111,7 +111,7 @@ public class ReporteController extends GeneralController{
         return respuestaHttp;
     }
 
-    @DeleteMapping("/eliminar")
+    @PostMapping("/eliminar")
     @ResponseBody
     public RespuestaHttp eliminarReporte(@RequestParam("codigo") String codigo){
         RespuestaHttp respuestaHttp;
